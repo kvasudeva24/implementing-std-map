@@ -5,23 +5,29 @@ using Color = bool;
 constexpr Color RED = false;
 constexpr Color BLACK = true;
 
-template <typename K, typename V>
-struct Node{
-    std::optional<K> key;
-    std::optional<V> value;
-    Color color = RED;
-    Node* left = nullptr;
-    Node* right = nullptr;
-    Node* parent = nullptr;
 
-    Node(K k, V v) : key(k), value(v) {};
-};
+
 
 template<typename K, typename V>
 class map_rb{
 private:
+
+    struct Node{
+        std::optional<K> key;
+        std::optional<V> value;
+        Color color = RED;
+        Node* left = nullptr;
+        Node* right = nullptr;
+        Node* parent = nullptr;
+
+        Node(K k, V v) : key(k), value(v) {};
+        Node() = default;
+    };  
+
+
     Node* root = nullptr;
     Node*  NIL = nullptr;
+    size_t size = 0;
 
     void rotate_left(Node* x){
         Node* y = x->right;
@@ -59,13 +65,90 @@ private:
         x->parent = y;
     }
 
+    void insert(const K& key, const V& value){
+        Node* newNode = new Node<K, V>(key, value);
+        newNode->left = newNode->right = NIL;
+        Node* iter = root;
+        if(iter == NIL){
+            root = newNode;
+            newNode->color = BLACK;
+            newNode->parent = NIL;
+            return;
+        }
+
+        Node* node_par = nullptr;
+        while(iter != NIL){
+            node_par = iter;
+            if(iter->key.value() > key){
+                iter = iter->left;
+            } else {
+                iter =  iter->right;
+            }
+        }
+
+        newNode->parent = node_par;
+
+        if(node_par->key.value() > key){
+            node_par->left = newNode;
+        } else {
+            node_par->right = newNode;
+        }
+        rebalance(newNode);
+    }
+    void rebalance(Node* x){
+        //see readme for rebalancing details and cases
+        Node* iter = x;
+
+        while(iter->color == RED && iter->parent->color == RED){
+            if(iter->parent == iter->parent->parent->left){
+                Node* uncle = iter->parent->parent->right;
+                if(uncle->color == RED){
+                    uncle->color = BLACK;
+                    iter->parent->color = BLACK;
+                    iter->parent->parent->color = RED;
+                    iter = iter->parent->parent;
+                } else {
+                    if(iter->parent->right == iter){
+                        rotate_left(iter->parent);
+                    }
+                    iter->parent->color = BLACK;
+                    iter->parent->parent->color = RED;
+                    rotate_right(iter->parent->parent);
+                }
+            } else {
+                Node* uncle = iter->parent->parent->left;
+                if(uncle->color == RED){
+                    uncle->color = BLACK;
+                    iter->parent->color = BLACK;
+                    iter->parent->parent->color = RED;
+                    iter = iter->parent->parent;
+                } else {
+                    if(iter->parent->left == iter){
+                        rotate_right(iter->parent);
+                    }
+                    iter->parent->color = BLACK;
+                    iter->parent->parent->color = RED;
+                    rotate_left(iter->parent->parent);
+                }
+            }
+        }
+        root->color = BLACK;
+    }
+
 public:
     map_rb<K, V>(){
         NIL = new Node<K,V>();
         NIL->color = BLACK;
         NIL->left = NIL->right = NIL->parent = NIL;
-
         root = NIL;
+    }
+
+
+    V& at(const K& key);
+    V& operator[](const K& key);
+
+    size_t size(){
+        return size;
     }
 
 
