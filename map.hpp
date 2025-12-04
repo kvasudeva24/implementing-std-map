@@ -99,17 +99,20 @@ private:
         //see readme for rebalancing details and cases
         Node* iter = x;
 
-        while(iter->color == RED && iter->parent->color == RED){
+        while(iter->parent->color == RED){
             if(iter->parent == iter->parent->parent->left){
                 Node* uncle = iter->parent->parent->right;
                 if(uncle->color == RED){
-                    uncle->color = BLACK;
+                    unlce->color = BLACK;
                     iter->parent->color = BLACK;
                     iter->parent->parent->color = RED;
                     iter = iter->parent->parent;
                 } else {
                     if(iter->parent->right == iter){
-                        rotate_left(iter->parent);
+                        iter = iter->parent;
+                        rotate_left(iter);
+                        //because the rotation changes the parent child property we need
+                        //to go up a level
                     }
                     iter->parent->color = BLACK;
                     iter->parent->parent->color = RED;
@@ -124,7 +127,10 @@ private:
                     iter = iter->parent->parent;
                 } else {
                     if(iter->parent->left == iter){
-                        rotate_right(iter->parent);
+                        iter = iter->parent;
+                        rotate_right(iter);
+                        //because the rotation changes the parent child property we need
+                        //to go up a level
                     }
                     iter->parent->color = BLACK;
                     iter->parent->parent->color = RED;
