@@ -18,7 +18,7 @@ There are two main cases:
         recolor the parent to black and the grandparent to red
         perform a right rotation on the grandparent to restore balance
 
-2.  
+2.  Parent of the inserted node is the right child of the grandparent
     a. if the uncle is also red 
         recolor both the parent and the uncle to black 
         recolor the grandparent to red
@@ -28,7 +28,9 @@ There are two main cases:
         if the inserted node is the left child of the parent
             perform a right rotation on the parent
         recolor the parent to black and the grandparent to red
-        perform a right rotation on the grandparent
+        perform a left rotation on the grandparent
 
 At the end always set the root color to be black to make sure we have not violated anything
     
+
+Leaving unfinished as I get the internals and will circle back once I finish the rest
